@@ -1,3 +1,48 @@
+import logging
+from datamodel.search.Zhouy46Szeng5Panw4_datamodel import Zhouy46Szeng5Panw4Link, OneZhouy46Szeng5Panw4UnProcessedLink
+from spacetime.client.IApplication import IApplication
+from spacetime.client.declarations import Producer, GetterSetter, Getter
+from lxml import html,etree
+import re, os
+from time import time
+from uuid import uuid4
+
+from urlparse import urlparse, parse_qs
+from uuid import uuid4
+
+logger = logging.getLogger(__name__)
+LOG_HEADER = "[CRAWLER]"
+
+@Producer(Zhouy46Szeng5Panw4Link)
+@GetterSetter(OneZhouy46Szeng5Panw4UnProcessedLink)
+class CrawlerFrame(IApplication):
+    app_id = "Zhouy46Szeng5Panw4"
+
+    def __init__(self, frame):
+        self.app_id = "Zhouy46Szeng5Panw4"
+        self.frame = frame
+
+
+    def initialize(self):
+        self.count = 0
+        links = self.frame.get_new(OneZhouy46Szeng5Panw4UnProcessedLink)
+        if len(links) > 0:
+            print "Resuming from the previous state."
+            self.download_links(links)
+        else:
+            l = Zhouy46Szeng5Panw4Link("http://www.ics.uci.edu/")
+            print l.full_url
+            self.frame.add(l)
+
+
+    def update(self):
+        try:
+            unprocessed_links = self.frame.get_new(OneZhouy46Szeng5Panw4UnProcessedLink)
+            if unprocessed_links:
+                self.download_links(unprocessed_links)
+        except:
+            pass
+
     def download_links(self, unprocessed_links):
         print len(unprocessed_links)
         for link in unprocessed_links:
@@ -7,12 +52,16 @@
             try:
                 for l in links:
                     if is_valid(l):
-                        self.frame.add(Zhouy46Link(l))
+                        self.frame.add(Zhouy46Szeng5Panw4Link(l))
             except:
                 pass
 
 
-
+    def shutdown(self):
+        print (
+            "Time time spent this session: ",
+            time() - self.starttime, " seconds.")
+    
 def extract_next_links(rawDataObj):
     '''
      rawDataObj is an object of type UrlResponse declared at L20-30
@@ -71,3 +120,4 @@ def is_valid(url):
     except TypeError:
         print ("TypeError for ", parsed)
         return False
+
